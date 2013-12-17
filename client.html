@@ -294,7 +294,7 @@ window.THEWEBSOCKET.onmessage = function (chunk) {
    throw "Data kind invalid";
  }
 } catch (e) {
-  console.log("Parsing failed");
+  console.log("Parsing failed: " + message);
   console.log(e);
 }
 }

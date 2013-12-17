@@ -1,7 +1,7 @@
 import txws
 from Queue import Queue
 from twisted.web import http
-from twisted.internet import protocol, reactor, endpoints
+from twisted.internet import protocol, reactor
 
 
 def init_state(t_dict):
@@ -40,7 +40,7 @@ class MyRequestHandler(http.Request):
 
 
 class MyHTTP(http.HTTPChannel):
-    print 'MyHTTP initialized'
+    print 'HTTP protocol object initialized'
     requestFactory = MyRequestHandler
 
 
@@ -88,6 +88,7 @@ class MyWSFactory(protocol.Factory):
         print WebSocket.websockets
         return ws
 
+
 class BitClientFactory(protocol.Factory):
     def buildProtocol(self, addr):
         print 'building a BitClient object'
@@ -95,6 +96,7 @@ class BitClientFactory(protocol.Factory):
         return bc
 
 bit_client = BitClient()
+print 'Listening for BitTorrent clients on port 8002'
 reactor.listenTCP(8002, BitClientFactory())
 reactor.listenTCP(8000, MyHTTPFactory())
 reactor.listenTCP(8001, txws.WebSocketFactory(MyWSFactory()))

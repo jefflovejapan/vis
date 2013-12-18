@@ -98,6 +98,6 @@ class BitClientFactory(protocol.Factory):
 bit_client = BitClient()
 print 'Listening for BitTorrent clients on port 8002'
 reactor.listenTCP(8002, BitClientFactory())
-reactor.listenTCP(8000, MyHTTPFactory())
+reactor.listenTCP(80, MyHTTPFactory())
 reactor.listenTCP(8001, txws.WebSocketFactory(MyWSFactory()))
 reactor.run()

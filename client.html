@@ -1,4 +1,4 @@
-<head><script src="http://d3js.org/d3.v3.js" charset="utf-8"></script></head>
+       <head><script src="http://d3js.org/d3.v3.js" charset="utf-8"></script></head>
 <body>
   <script type="text/javascript">
   window.mything = function () {
@@ -76,12 +76,18 @@
    draw_svgs();
  };
 
+ 
  var draw_svgs = function () {
+   var peers_div = d3.select("body")
+    .append("div")
+    .attr("class", "peers")
+
   var divs = d3.select("body")
-  .selectAll("div")
+  .selectAll("div.file")
   .data(files)
   .enter()
   .append("div")
+  .attr("class", "file")
   .style("height", div_height);
 
   var texts = divs.append("text")
@@ -280,7 +286,7 @@ var build_peer = function (peer_dict) {
 window.THEWEBSOCKET.onmessage = function (chunk) {
   var messages = (partial_message + chunk.data).split("\r\n\r\n");
   partial_message = "";
-  messages.forEach( function (message) {
+  messages.forEach(function (message) {
    try {
     var meat = JSON.parse(message);
     if (meat.kind === "init") {

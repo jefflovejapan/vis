@@ -28,6 +28,7 @@
   var peers = {};
   var pieces = {};
   var files = [];
+  var partial_message = "";
   var want_file_pos = [];
   var window_width = window.innerWidth;
   var window_height = window.innerHeight;
@@ -277,7 +278,7 @@ var build_peer = function (peer_dict) {
 };
 
 window.THEWEBSOCKET.onmessage = function (chunk) {
-  var messages = chunk.data.split('\r\n\r\n');
+  var messages = (partial_message + chunk.data).split('\r\n\r\n');
   messages.forEach( function (message) {
    try {
     var meat = JSON.parse(message);
@@ -294,8 +295,12 @@ window.THEWEBSOCKET.onmessage = function (chunk) {
    throw "Data kind invalid";
  }
 } catch (e) {
-  console.log("Parsing failed: " + message);
-  console.log(e);
+  if (message[0] === "{") {
+      partial_message = message
+  } else {
+      console.log("Parsing failed: " + messages);
+      console.log(e);
+  }
 }
 }
 );

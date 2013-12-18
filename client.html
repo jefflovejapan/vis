@@ -279,6 +279,7 @@ var build_peer = function (peer_dict) {
 
 window.THEWEBSOCKET.onmessage = function (chunk) {
   var messages = (partial_message + chunk.data).split('\r\n\r\n');
+  partial_message = ""
   messages.forEach( function (message) {
    try {
     var meat = JSON.parse(message);

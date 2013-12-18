@@ -279,28 +279,31 @@ var build_peer = function (peer_dict) {
 
 window.THEWEBSOCKET.onmessage = function (chunk) {
   var messages = (partial_message + chunk.data).split('\r\n\r\n');
-  partial_message = ""
+  partial_message = "";
   messages.forEach( function (message) {
    try {
     var meat = JSON.parse(message);
     if (meat.kind === "init") {
-     build_model(meat);
-   } else if (meat.kind === "request") {
-     vis_request(meat);
-   } else if (meat.kind === "piece") {
-     vis_write(meat);
-   } else if (meat.kind === "activate") {
-    console.log("Activate");
-    build_peer(meat);
-  } else {
-   throw "Data kind invalid";
- }
-} catch (e) {
+       build_model(meat);
+     } else if (meat.kind === "request") {
+       vis_request(meat);
+     } else if (meat.kind === "piece") {
+       vis_write(meat);
+     } else if (meat.kind === "activate") {
+      console.log("Activate");
+      build_peer(meat);
+    } else {
+     throw "Data kind invalid";
+  }
+  } catch (e) {
   if (message[0] === "{") {
-      partial_message = message
+    partial_message = message;
+    console.log("partial message: " + partial_message);
+    console.log("message: " + message);
+
   } else {
-      console.log("Parsing failed: " + messages);
-      console.log(e);
+    console.log("Parsing failed: " + messages);
+    console.log(e);
   }
 }
 }

@@ -279,7 +279,7 @@ var build_peer = function (peer_dict) {
 
 window.THEWEBSOCKET.onmessage = function (chunk) {
   var messages = (partial_message + chunk.data).split('\r\n\r\n');
-  partial_message = ""
+  partial_message = "";
   messages.forEach( function (message) {
    try {
     var meat = JSON.parse(message);
@@ -297,7 +297,7 @@ window.THEWEBSOCKET.onmessage = function (chunk) {
  }
 } catch (e) {
   if (message[0] === "{") {
-      partial_message = message
+      partial_message = message;
   } else {
       console.log("Parsing failed: " + messages);
       console.log(e);

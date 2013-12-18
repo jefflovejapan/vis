@@ -26,6 +26,7 @@
   };
 
   var peers = {};
+  var peers_div;
   var pieces = {};
   var files = [];
   var partial_message = "";
@@ -73,33 +74,38 @@
        files[i].relevant.push(j);
      }
    });
-   draw_svgs();
+   draw_files();
  };
 
  
- var draw_svgs = function () {
-   var peers_div = d3.select("body")
+var draw_files = function () {
+  peers_div = d3.select("body")
     .append("div")
-    .attr("class", "peers")
+    .attr("class", "peers_div");
 
-  var divs = d3.select("body")
-  .selectAll("div.file")
-  .data(files)
-  .enter()
-  .append("div")
-  .attr("class", "file")
-  .style("height", div_height);
+  var divs = d3
+    .select("body")
+    .selectAll("div.file")
+    .data(files)
+    .enter()
+    .append("div")
+    .attr("class", "file")
+    .style("height", div_height);
 
-  var texts = divs.append("text")
-  .text(function (d) { return d.path.join('/'); })
-  .style("font-size", text_height)
-  .style("font-family", "sans-serif")
-  .style("color", "#09C53B")
-  .attr("y", 30);
+  var texts = divs
+    .append("text")
+    .text(function (d) { return d.path.join('/'); })
+    .style("font-size", text_height)
+    .style("font-family", "sans-serif")
+    .style("color", "#09C53B")
+    .attr("y", 30);
 
-  var svgs = divs.append("svg");
+  var svgs = divs
+    .append("svg")
+    .attr("class", "file");
 
-  var vis_bars = svgs.append("g")
+  var vis_bars = svgs
+  .append("g")
   .attr("class", "bar")
   .attr("transform", "translate(0," + bar_offset + ")")
   .attr("id", function (d, i) {
@@ -131,6 +137,7 @@
   .attr("y", (bar_height / 2) - (piece_height / 2))
   .attr("height", piece_height - padding)
   .attr("width", piece_width - padding)
+
   .attr("opacity", 0)
 
   var piece_click = vis_pieces.on("click", function (d, i, j) {
@@ -255,6 +262,7 @@
   })
 };
 
+
 var vis_request = function (req_dict) {
 };
 
@@ -277,41 +285,75 @@ var vis_write = function (write_dict) {
 
 
 var build_peer = function (peer_dict) {
+  var peers_list = [];
   var ip = peer_dict.address[0];
   var color = colors.shift();
   var location = peer_dict.location;
+  
   peers[ip] = {"color": color, "location": location, "pieces": []};
+
+  for(var key in peers) {
+    peers_list.push(key);
+  }
+  draw_peer_legend(peers_list);
+};
+
+var draw_peer_legend = function(peers_list) {
+  try {
+    var peer_divs = peers_div
+      .selectAll("div.peer")
+      .data(peers_list)
+      .enter()
+      .append("div")
+      .attr("class", "peer");
+
+    peer_svgs = peer_divs
+      .append("svg")
+      .attr("class", "peer_box")
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", 50)
+      .attr("height", 50)
+      .attr("fill", function (d) {
+        return peers[d].color;
+      });
+
+    } catch (e) {
+      console.log(e);
+    };
+  
+  
 };
 
 window.THEWEBSOCKET.onmessage = function (chunk) {
   var messages = (partial_message + chunk.data).split("\r\n\r\n");
   partial_message = "";
   messages.forEach(function (message) {
-   try {
+  try {
     var meat = JSON.parse(message);
-    if (meat.kind === "init") {
-       build_model(meat);
-     } else if (meat.kind === "request") {
-       vis_request(meat);
-     } else if (meat.kind === "piece") {
-       vis_write(meat);
-     } else if (meat.kind === "activate") {
-      console.log("Activate");
-      build_peer(meat);
-    } else {
-     throw "Data kind invalid";
-  }
   } catch (e) {
-  if (message[0] === "{") {
-      partial_message = message;
-      console.log("partial message: " + partial_message);
-      console.log("message: " + message);
-
-  } else {
-    console.log("Parsing failed: " + messages);
-    console.log(e);
+    if (message[0] === "{") {
+        partial_message = message;
+        console.log("partial message: " + partial_message);
+        console.log("message: " + message);
+    } else {
+      console.log("Parsing failed: " + messages);
+      console.log(e);
+    }
   }
-}
+  if (meat.kind === "init") {
+     build_model(meat);
+   } else if (meat.kind === "request") {
+     vis_request(meat);
+   } else if (meat.kind === "piece") {
+     vis_write(meat);
+   } else if (meat.kind === "activate") {
+    console.log("Activate");
+    build_peer(meat);
+  } else {
+   throw "Data kind invalid";
+  }
 }
 );
 };

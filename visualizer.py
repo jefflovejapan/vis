@@ -24,8 +24,10 @@ class BitClient(protocol.Protocol):
 
 class MyRequestHandler(http.Request):
     clientHTML = open('client.html').read()
+    clientJS = open('client.js').read()
     resources = {
-        '/': clientHTML
+        '/': clientHTML,
+        '/client.js': clientJS
     }
 
     def process(self):

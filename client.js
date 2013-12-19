@@ -124,7 +124,7 @@ var draw_files = function () {
   .attr("x", 0)
   .attr("y", 0)
   .attr("width", function (d) { 
-   return 10 * d.relevant.length + padding;
+   return PEER_ATTR.width * d.relevant.length + padding;
  })
   .attr("height", BAR_ATTR.height)
   .attr("fill", "white")

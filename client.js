@@ -27,8 +27,8 @@ window.mything = function () {
     offset : 10
   };
   var PIECE_ATTR = {
-    height : 10,
-    width : 10,
+    height : 15,
+    width : 15,
     duration : 500
   };
   var PEER_ATTR = {

@@ -32,8 +32,8 @@ window.mything = function () {
     duration : 500
   };
   var PEER_ATTR = {
-    height: 50,
-    width: 50,
+    height: 30,
+    width: 30,
     margin: 2
   };
   var peers_div_bottom_margin = 5

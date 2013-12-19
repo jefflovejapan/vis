@@ -25,35 +25,39 @@
     return colors;
   };
 
+  var BAR_ATTR = {   
+    height : 16,
+    offset : 10
+  };
+  var PIECE_ATTR = {
+    height : 10,
+    width : 10,
+    duration : 500
+  };
   var peers = {};
   var peers_div;
   var pieces = {};
   var files = [];
   var partial_message = "";
   var want_file_pos = [];
-  var window_width = window.innerWidth;
-  var window_height = window.innerHeight;
   var xScale;
   var div_height = 50;
   var padding = 1;
-  var bar_height = 16;
-  var bar_offset = 10;
-  var piece_height = 10;
-  var piece_width = 10;
-  var piece_duration = 500;
   var text_height = 10;
   var parent_svg;
-  var piece_y = Math.floor(bar_height / 2) - Math.floor(piece_height / 2);
+  var piece_y = Math.floor(BAR_ATTR.height / 2) - Math.floor(PIECE_ATTR.height / 2);
   var mouse_pointer_width = 15;
-  var popover_height = div_height - (2 * text_height);
-  var popover_width = popover_height * 4;
-  var popover_text_height = 10;
-  var popover_internal_padding = 2;
-  var popover_duration = 300;
-  var popover_opacity = 0.85;
-  var popover_box_offset = padding;
-  var popover_peer_square_size = 20;
-  var popover_text_offset = 2 * popover_internal_padding;
+  var POPOVER_ATTR = {
+    height: div_height - (2 * text_height),
+    width: (div_height - (2 * text_height)) * 4,
+    text_height: 10,
+    internal_padding: 2,
+    duration: 300,
+    opacity: 0.85,
+    box_offset: padding,
+    peer_square_size: 20,
+    text_offset: 4
+  };
   var color_scale_10 = d3.scale.category10();
   var color_scale_20 = d3.scale.category20c();
   var colors = build_colors();
@@ -107,7 +111,7 @@ var draw_files = function () {
   var vis_bars = svgs
   .append("g")
   .attr("class", "bar")
-  .attr("transform", "translate(0," + bar_offset + ")")
+  .attr("transform", "translate(0," + BAR_ATTR.offset + ")")
   .attr("id", function (d, i) {
     console.log('inside vis_bars', pieces);
     return "#bar" + d.ip;
@@ -118,7 +122,7 @@ var draw_files = function () {
   .attr("width", function (d) { 
    return 10 * d.relevant.length + padding;
  })
-  .attr("height", bar_height)
+  .attr("height", BAR_ATTR.height)
   .attr("fill", "white")
   .attr("stroke", "gray")
   .attr("stroke-width", 1)
@@ -133,10 +137,10 @@ var draw_files = function () {
   .attr("class", "piece")
   .attr("class", function (d) {
     return ("piece" + d); })
-  .attr("x", function (d, i) { return padding + i * piece_width; })
-  .attr("y", (bar_height / 2) - (piece_height / 2))
-  .attr("height", piece_height - padding)
-  .attr("width", piece_width - padding)
+  .attr("x", function (d, i) { return padding + i * PIECE_ATTR.width; })
+  .attr("y", (BAR_ATTR.height / 2) - (PIECE_ATTR.height / 2))
+  .attr("height", PIECE_ATTR.height - padding)
+  .attr("width", PIECE_ATTR.width - padding)
 
   .attr("opacity", 0)
 
@@ -147,71 +151,78 @@ var draw_files = function () {
     var xPosition = parseFloat(d3.select(this).attr("x"));
     var yPosition = parseFloat(d3.select(this).attr("y"));
 
-    d3.select(svgs[0][j])
-      .append("g")
-      .attr("class", "tooltip")
-      .attr("transform", "translate(" + (xPosition + mouse_pointer_width) + "," + yPosition + ")")
+    var tooltip = d3.select(svgs[0][j])
+        .append("g")
+        .attr("class", "tooltip")
+        .attr("transform", "translate(" + (xPosition + mouse_pointer_width) + "," + yPosition + ")")
         .append("rect")
         .attr("class", "popover_main")
         .attr("x", 0)
         .attr("y", 0)
-        .attr("width", popover_width)
-        .attr("height", popover_height)
+        .attr("width", function () {
+          return POPOVER_ATTR.width;
+        })
+        .attr("height", POPOVER_ATTR.height)
         .attr("fill", "white")
         .attr("stroke", "black")
         .attr("stroke-width", 1)
         .attr("opacity", 0)
         .transition()
-        .duration(popover_duration)
-        .attr("opacity", popover_opacity);
+        .duration(POPOVER_ATTR.duration)
+        .attr("opacity", POPOVER_ATTR.opacity);
 
     var piece_text = d3.select("g.tooltip")
       .append("text")
-      .attr("x", popover_internal_padding + popover_peer_square_size + popover_text_offset)
-      .attr("y", popover_text_height + popover_internal_padding)
+      .attr("x", POPOVER_ATTR.internal_padding + POPOVER_ATTR.peer_square_size + POPOVER_ATTR.text_offset)
+      .attr("y", POPOVER_ATTR.text_height + POPOVER_ATTR.internal_padding)
       .text('piece ' + piece_id)
-      .attr("font-size", popover_text_height)
+      .attr("font-size", POPOVER_ATTR.text_height)
       .attr("opacity", 0)
       .transition()
-      .duration(popover_duration)
-      .attr("opacity", popover_opacity);
+      .duration(POPOVER_ATTR.duration)
+      .attr("opacity", POPOVER_ATTR.opacity);
     
     var peer_ip_text = d3.select("g.tooltip")
       .append("text")
-      .attr("x", popover_internal_padding + popover_peer_square_size + popover_text_offset)
-      .attr("y", 2 * (popover_text_height + popover_internal_padding))
+      .attr("x", function () {
+        return POPOVER_ATTR.internal_padding +
+        POPOVER_ATTR.peer_square_size + POPOVER_ATTR.text_offset;
+      })
+      .attr("y", 2 * (POPOVER_ATTR.text_height + POPOVER_ATTR.internal_padding))
       .text(pieces[piece_id])
-      .attr("font-size", popover_text_height)
+      .attr("font-size", POPOVER_ATTR.text_height)
       .attr("opacity", 0)
       .transition()
-      .duration(popover_duration)
-      .attr("opacity", popover_opacity);
+      .duration(POPOVER_ATTR.duration)
+      .attr("opacity", POPOVER_ATTR.opacity);
 
     var peer_location_box = d3.select("g.tooltip")
       .append("g")
       .attr("class", "location_text")
-      .attr("transform", "translate(" + (peer_ip_text[0][0].getComputedTextLength() + (3 * popover_internal_padding) + popover_peer_square_size) + ",0)")
+      .attr("transform", function() {
+        return "translate(" + (peer_ip_text[0][0].getComputedTextLength() + (3 * POPOVER_ATTR.internal_padding) + POPOVER_ATTR.peer_square_size) + ",0)";
+      });
 
     var country_text = peer_location_box.append("text")
       .attr("x", function () {
-        return popover_internal_padding + popover_text_offset;
+        return POPOVER_ATTR.internal_padding + POPOVER_ATTR.text_offset;
       })
-      .attr("y", popover_text_height + popover_internal_padding)
+      .attr("y", POPOVER_ATTR.text_height + POPOVER_ATTR.internal_padding)
       // Location is in the peer's location property
       .text(loc_dict.country_name)
-      .attr("font-size", popover_text_height)
+      .attr("font-size", POPOVER_ATTR.text_height)
       .attr("opacity", 0)
       .transition()
-      .duration(popover_duration)
-      .attr("opacity", popover_opacity);
+      .duration(POPOVER_ATTR.duration)
+      .attr("opacity", POPOVER_ATTR.opacity);
 
       var region_text = peer_location_box.append("text");
 
       if (loc_dict.region_name !== '' || loc_dict.city !== '') {
         region_text.attr("x", function () {
-        return popover_internal_padding + popover_text_offset;
+        return POPOVER_ATTR.internal_padding + POPOVER_ATTR.text_offset;
       })
-      .attr("y", 2 * (popover_text_height + popover_internal_padding))
+      .attr("y", 2 * (POPOVER_ATTR.text_height + POPOVER_ATTR.internal_padding))
       // Location is in the peer's location property
       .text( function () {
         if (loc_dict.city !== '' && loc_dict.region_name !== '') {
@@ -223,34 +234,33 @@ var draw_files = function () {
         };
         return loc_string;
       })
-      .attr("font-size", popover_text_height)
+      .attr("font-size", POPOVER_ATTR.text_height)
       .attr("opacity", 0)
       .transition()
-      .duration(popover_duration)
-      .attr("opacity", popover_opacity);
+      .duration(POPOVER_ATTR.duration)
+      .attr("opacity", POPOVER_ATTR.opacity);
     }
-
 
     var popover_piece_square = d3.select("g.tooltip")
       .append("rect")
       .attr("class", "piece_square")
       .attr("fill", piece_color)
-      .attr("x", popover_internal_padding)
-      .attr("y", (popover_height / 2) - (popover_peer_square_size / 2))
-      .attr("width", popover_peer_square_size)
-      .attr("height", popover_peer_square_size)
+      .attr("x", POPOVER_ATTR.internal_padding)
+      .attr("y", (POPOVER_ATTR.height / 2) - (POPOVER_ATTR.peer_square_size / 2))
+      .attr("width", POPOVER_ATTR.peer_square_size)
+      .attr("height", POPOVER_ATTR.peer_square_size)
       .attr("opacity", 0)
       .transition()
-      .duration(popover_duration)
+      .duration(POPOVER_ATTR.duration)
       .attr("opacity", 1);
 
     var adjust_box_size = d3.select("rect.popover_main")
         .attr("width", function () {
-          var total_width = popover_internal_padding + popover_peer_square_size + (3 * popover_internal_padding) +
+          var total_width = POPOVER_ATTR.internal_padding + POPOVER_ATTR.peer_square_size + (3 * POPOVER_ATTR.internal_padding) +
             peer_ip_text[0][0].getComputedTextLength() +
             d3.max([country_text[0][0].getComputedTextLength(),
                    region_text[0][0].getComputedTextLength()]) +
-            (4 * popover_internal_padding);
+            (4 * POPOVER_ATTR.internal_padding);
           return total_width;
         });
   });
@@ -278,7 +288,7 @@ var vis_write = function (write_dict) {
  d3.selectAll("rect.piece" + piece_index)
  .attr("fill", get_color(ip))
  .transition()
- .duration(piece_duration)
+ .duration(PIECE_ATTR.duration)
  .attr("opacity", 1);
 };
 

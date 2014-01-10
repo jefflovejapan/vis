@@ -6,7 +6,7 @@ Vis (working title) is a Twisted web server and D3.js visualization that works i
 
 The easiest way to install vis is to simply clone this Git repository. Afterward, entering
 
-    $ python drench.py
+    $ python vis.py
 
 from the command line will start up the web server, which will listen for connections on two ports by default -- port 8002 (for incoming Drench connections) and port 80 (for incoming browser / client connections).
 

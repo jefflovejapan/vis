@@ -12,4 +12,6 @@ from the command line will start up the web server, which will listen for connec
 
 #Status
 
-While multifile torrents work as expected, Vis lacks support right now for single-file torrents. Planned feature additions include making the entire visualization responsive, and adding the ability to highlight all pieces downloaded from a single seeder.
+While multifile torrents work as expected, right now Vis lacks support for single-file torrents. Planned feature additions:
+- make everything responsive, not just list of peers in header
+- add ability to highlight all pieces downloaded from a single seeder
